@@ -13,9 +13,7 @@ from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from langchain.chat_models import ChatOpenAI
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.docstore.document import Document
-from langchain.llms.openai import OpenAI
-from langchain.chains.summarize import load_summarize_chain
+from Summary import split_text
 
 # Gets text from PDF
 def get_text(pdfs):
@@ -24,6 +22,7 @@ def get_text(pdfs):
         pdf_reader = PdfReader(pdf)
         for page in pdf_reader.pages:
             text += page.extract_text()
+    text = text.replace('\t',' ')
     return text
 
 # Splits obtained text into chunks
@@ -96,16 +95,12 @@ def main():
                 chunks = get_text_chunks(text)
                 vectorstore = get_vectorstore(chunks)
                 st.session_state.conversation = get_conversation_chain(vectorstore)
-
+        st.subheader("NOTE : Summarizing text for a large pdf will take more time and provide a broader summary"
+                     ", Nevertheless you will get a rough idea")
         if st.button("Summarize"):
-            with st.spinner('Please Wait...'):
+            with st.spinner('This may take a couple of minutes..'):
                 source_text = get_text(pdfs)
-                text_splitter = CharacterTextSplitter()
-                texts = text_splitter.split_text(source_text)
-                docs = [Document(page_content=t) for t in texts[:3]]
-                llm = OpenAI(temperature=0)
-                chain = load_summarize_chain(llm, chain_type="map_reduce")
-                summary = chain.run(docs)
+                summary = split_text(source_text)
                 st.success(summary)
 
 # Press the green button in the gutter to run the script.

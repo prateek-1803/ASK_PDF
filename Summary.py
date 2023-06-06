@@ -31,7 +31,7 @@ def split_text(text):
     # print(llm.get_num_tokens(chunk[0]))
     embeddings = OpenAIEmbeddings()
     vectors = embeddings.embed_documents([x.page_content for x in docs])
-    num_clusters = 6
+    num_clusters = min(len(docs),6)
     kmeans = KMeans(n_clusters=num_clusters, random_state=42).fit(vectors)
     closest_indices = []
 

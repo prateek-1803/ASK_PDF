@@ -63,18 +63,20 @@ def handle_question(question):
             st.write(bot_template.replace("{{MSG}}", message.content), unsafe_allow_html=True)
 
 
+def get_summary(text,summary):
+    summary += split_text(text)
+    st.success(summary)
 def main():
     load_dotenv()
     st.set_page_config(page_title="CHAT WITH MULTIPLE PDFS!",page_icon=":books:")
     st.write(css1,unsafe_allow_html=True)
-
     if "conversation" not in st.session_state:
         st.session_state.conversation = None
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = None
 
     st.header("Chat Here :)")
-
+    summary = "Summary : "
     # Input question
     question = st.text_input("Ask a question about your pdf:")
     if question:
@@ -100,8 +102,7 @@ def main():
         if st.button("Summarize"):
             with st.spinner('This may take a couple of minutes..'):
                 source_text = get_text(pdfs)
-                summary = split_text(source_text)
-                st.write(bot_template.replace("{{MSG}}", summary), unsafe_allow_html=True)
+                get_summary(source_text,summary)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':

@@ -7,12 +7,15 @@ import streamlit as st
 from htmlTemplate import css1,bot_template,user_template
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
-from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from langchain.chat_models import ChatOpenAI
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.docstore.document import Document
+from langchain.llms.openai import OpenAI
+from langchain.chains.summarize import load_summarize_chain
 
 # Gets text from PDF
 def get_text(pdfs):
@@ -93,6 +96,17 @@ def main():
                 chunks = get_text_chunks(text)
                 vectorstore = get_vectorstore(chunks)
                 st.session_state.conversation = get_conversation_chain(vectorstore)
+
+        if st.button("Summarize"):
+            with st.spinner('Please Wait...'):
+                source_text = get_text(pdfs)
+                text_splitter = CharacterTextSplitter()
+                texts = text_splitter.split_text(source_text)
+                docs = [Document(page_content=t) for t in texts[:3]]
+                llm = OpenAI(temperature=0)
+                chain = load_summarize_chain(llm, chain_type="map_reduce")
+                summary = chain.run(docs)
+                st.success(summary)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':

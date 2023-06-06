@@ -6,3 +6,6 @@ pypdf2
 python-dotenv
 faiss-cpu
 pydantic
+scikit-learn
+sklearn
+numpy

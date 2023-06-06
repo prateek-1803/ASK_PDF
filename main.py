@@ -101,7 +101,7 @@ def main():
             with st.spinner('This may take a couple of minutes..'):
                 source_text = get_text(pdfs)
                 summary = split_text(source_text)
-                st.success(summary)
+                st.write(bot_template.replace("{{MSG}}", summary), unsafe_allow_html=True)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
